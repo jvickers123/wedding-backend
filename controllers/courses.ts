@@ -1,9 +1,10 @@
 import { asyncHandler } from '../middleware/async';
 import Course from '../models/Course';
 import Bootcamp from '../models/Bootcamp';
-import { NextFunction, Request, Response } from 'express';
 import { Error } from 'mongoose';
-import { AdvancedResults } from '../helpers/types';
+import { RequestWithUser, ResponseWithPagination } from '../helpers/types';
+import { ErrorResponse } from '../utils/errorResponse';
+
 /**
  * Get Courses
  * @route GET /api/v1/courses
@@ -11,11 +12,7 @@ import { AdvancedResults } from '../helpers/types';
  * @access public
  */
 export const getCourses = asyncHandler(
-  async (
-    req: Request,
-    res: Response & { advancedResults?: AdvancedResults },
-    _next: NextFunction
-  ) => {
+  async (req, res: ResponseWithPagination, _next) => {
     const spearchWithinBootcamp: { bootcamp?: string } = {};
 
     if (req.params.bootcampId) {
@@ -42,22 +39,18 @@ export const getCourses = asyncHandler(
  * @route GET /api/v1/courses/:courseId
  * @access public
  */
-export const getSingleCourse = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const course = await Course.findById(req.params.courseId).populate({
-      path: 'bootcamp',
-      select: 'name description',
-    });
+export const getSingleCourse = asyncHandler(async (req, res, _next) => {
+  const course = await Course.findById(req.params.courseId).populate({
+    path: 'bootcamp',
+    select: 'name description',
+  });
 
-    if (!course)
-      throw new Error.CastError('string', req.params.courseId, '_id');
-
-    res.status(200).json({
-      success: true,
-      data: course,
-    });
-  }
-);
+  if (!course) throw new Error.CastError('string', req.params.courseId, '_id');
+  res.status(200).json({
+    success: true,
+    data: course,
+  });
+});
 
 /**
  * Get Single Courses
@@ -65,13 +58,22 @@ export const getSingleCourse = asyncHandler(
  * @access private
  */
 export const createCourse = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req: RequestWithUser, res, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
+
     req.body.bootcamp = req.params.bootcampId;
 
     const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
     if (!bootcamp)
       throw new Error.CastError('string', req.params.courseId, '_id');
+
+    if (req.user._id !== bootcamp.user?._id && req.user.role !== 'admin') {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to add a course to this bootcamp`,
+        403
+      );
+    }
 
     const course = await Course.create(req.body);
 
@@ -88,8 +90,22 @@ export const createCourse = asyncHandler(
  * @access private
  */
 export const updateCourse = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const course = await Course.findByIdAndUpdate(
+  async (req: RequestWithUser, res, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
+
+    const courseToUpdate = await Course.findById(req.params.courseId);
+
+    if (!courseToUpdate)
+      throw new Error.CastError('string', req.params.courseId, '_id');
+
+    if (req.user._id !== courseToUpdate.user && req.user.role !== 'admin') {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to update this course`,
+        403
+      );
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(
       req.params.courseId,
       req.body,
       {
@@ -98,12 +114,9 @@ export const updateCourse = asyncHandler(
       }
     );
 
-    if (!course)
-      throw new Error.CastError('string', req.params.courseId, '_id');
-
     res.status(200).json({
       success: true,
-      data: course,
+      data: updatedCourse,
     });
   }
 );
@@ -114,13 +127,22 @@ export const updateCourse = asyncHandler(
  * @access private
  */
 export const deleteCourse = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const course = await Course.findById(req.params.courseId);
+  async (req: RequestWithUser, res, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
 
-    if (!course)
+    const courseToDelete = await Course.findById(req.params.courseId);
+
+    if (!courseToDelete)
       throw new Error.CastError('string', req.params.courseId, '_id');
 
-    await course.remove();
+    if (req.user._id !== courseToDelete.user && req.user.role !== 'admin') {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to delete this course`,
+        403
+      );
+    }
+
+    await courseToDelete.remove();
 
     res.status(200).json({
       success: true,

@@ -25,8 +25,23 @@ const errorHandler = (err, req, res, next) => {
     }
     if (err.name === 'MongooseError') {
         error.message = err.message;
-        if (err.message !== 'There was a problem with file upload')
+        if (err.message !== 'There was a problem with file upload') {
             error.statusCode = 400;
+        }
+        if (err.message === 'Invalid credentials' ||
+            err.message === 'Not authorized to access this') {
+            error.statusCode = 401;
+        }
+    }
+    if (err.message.includes(' has already published a bootcamp') ||
+        err.message.includes('is not authorised to access this route') ||
+        err.message.includes('is not authorised to') ||
+        err.message === 'No user with that email' ||
+        err.message === 'Email could not be sent' ||
+        err.message === 'Invalid Token' ||
+        err.message === 'Password is incorrect') {
+        error.message = err.message;
+        error.statusCode = err.statusCode;
     }
     res.status(error.statusCode || 500).json({
         success: false,

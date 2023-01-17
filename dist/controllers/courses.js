@@ -17,6 +17,7 @@ const async_1 = require("../middleware/async");
 const Course_1 = __importDefault(require("../models/Course"));
 const Bootcamp_1 = __importDefault(require("../models/Bootcamp"));
 const mongoose_1 = require("mongoose");
+const errorResponse_1 = require("../utils/errorResponse");
 /**
  * Get Courses
  * @route GET /api/v1/courses
@@ -64,10 +65,16 @@ exports.getSingleCourse = (0, async_1.asyncHandler)((req, res, _next) => __await
  * @access private
  */
 exports.createCourse = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
     req.body.bootcamp = req.params.bootcampId;
     const bootcamp = yield Bootcamp_1.default.findById(req.params.bootcampId);
     if (!bootcamp)
         throw new mongoose_1.Error.CastError('string', req.params.courseId, '_id');
+    if (req.user._id !== ((_a = bootcamp.user) === null || _a === void 0 ? void 0 : _a._id) && req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to add a course to this bootcamp`, 403);
+    }
     const course = yield Course_1.default.create(req.body);
     res.status(200).json({
         success: true,
@@ -80,15 +87,21 @@ exports.createCourse = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(
  * @access private
  */
 exports.updateCourse = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
-    const course = yield Course_1.default.findByIdAndUpdate(req.params.courseId, req.body, {
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
+    const courseToUpdate = yield Course_1.default.findById(req.params.courseId);
+    if (!courseToUpdate)
+        throw new mongoose_1.Error.CastError('string', req.params.courseId, '_id');
+    if (req.user._id !== courseToUpdate.user && req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to update this course`, 403);
+    }
+    const updatedCourse = yield Course_1.default.findByIdAndUpdate(req.params.courseId, req.body, {
         new: true,
         runValidators: true,
     });
-    if (!course)
-        throw new mongoose_1.Error.CastError('string', req.params.courseId, '_id');
     res.status(200).json({
         success: true,
-        data: course,
+        data: updatedCourse,
     });
 }));
 /**
@@ -97,10 +110,15 @@ exports.updateCourse = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(
  * @access private
  */
 exports.deleteCourse = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
-    const course = yield Course_1.default.findById(req.params.courseId);
-    if (!course)
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
+    const courseToDelete = yield Course_1.default.findById(req.params.courseId);
+    if (!courseToDelete)
         throw new mongoose_1.Error.CastError('string', req.params.courseId, '_id');
-    yield course.remove();
+    if (req.user._id !== courseToDelete.user && req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to delete this course`, 403);
+    }
+    yield courseToDelete.remove();
     res.status(200).json({
         success: true,
         data: {},

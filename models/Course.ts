@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { CoursesType, GetAverageCostConstructor } from '../helpers/types';
 import Bootcamp from './Bootcamp';
 
 const CourseSchema = new mongoose.Schema(
@@ -38,6 +39,11 @@ const CourseSchema = new mongoose.Schema(
       ref: 'Bootcamp',
       required: true,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   {
     statics: {
@@ -66,20 +72,18 @@ const CourseSchema = new mongoose.Schema(
   }
 );
 
-type Constructor = {
-  getAverageCost: (id: mongoose.Types.ObjectId) => Promise<void>;
-};
+CourseSchema.post(
+  'save',
+  async function (this: CoursesType & GetAverageCostConstructor) {
+    await this.constructor.getAverageCost(this.bootcamp);
+  }
+);
 
-CourseSchema.post('save', async function () {
-  await (this.constructor as unknown as Constructor).getAverageCost(
-    this.bootcamp
-  );
-});
-
-CourseSchema.pre('remove', async function () {
-  await (this.constructor as unknown as Constructor).getAverageCost(
-    (this as unknown as { bootcamp: mongoose.Types.ObjectId }).bootcamp
-  );
-});
+CourseSchema.pre(
+  'remove',
+  async function (this: CoursesType & GetAverageCostConstructor) {
+    await this.constructor.getAverageCost(this.bootcamp);
+  }
+);
 
 export default mongoose.model('Course', CourseSchema);

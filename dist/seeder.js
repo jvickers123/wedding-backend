@@ -21,16 +21,19 @@ const mongoose_1 = __importDefault(require("mongoose"));
 require("colors");
 const Bootcamp_1 = __importDefault(require("./models/Bootcamp"));
 const Course_1 = __importDefault(require("./models/Course"));
+const User_1 = __importDefault(require("./models/User"));
 mongoose_1.default.set('strictQuery', false);
 mongoose_1.default.connect(process.env.MONGO_URI);
 // console.log(fs.readFileSync(`${__dirname}`), 'whassup');
 const bootcamps = JSON.parse(fs_1.default.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8'));
 const courses = JSON.parse(fs_1.default.readFileSync(`${__dirname}/_data/courses.json`, 'utf-8'));
+const users = JSON.parse(fs_1.default.readFileSync(`${__dirname}/_data/users.json`, 'utf-8'));
 // Import into db
 const importData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Bootcamp_1.default.create(bootcamps);
         yield Course_1.default.create(courses);
+        yield User_1.default.create(users);
         console.log('Data imported'.green.inverse);
         process.exit();
     }
@@ -42,6 +45,7 @@ const deleteData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Bootcamp_1.default.deleteMany();
         yield Course_1.default.deleteMany();
+        yield User_1.default.deleteMany();
         console.log('Data destroyed'.red.inverse);
         process.exit();
     }

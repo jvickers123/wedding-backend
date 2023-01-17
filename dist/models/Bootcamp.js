@@ -112,6 +112,11 @@ const BootcampSchema = new mongoose_1.default.Schema({
         type: Date,
         default: Date.now,
     },
+    user: {
+        type: mongoose_1.default.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -142,8 +147,7 @@ BootcampSchema.pre('save', function (next) {
 // Cascade delete courses when a bootcamp is deleted
 BootcampSchema.pre('remove', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if ('_id' in this)
-            yield Course_1.default.deleteMany({ bootcamp: this._id });
+        yield Course_1.default.deleteMany({ bootcamp: this._id });
         next();
     });
 });

@@ -3,6 +3,9 @@ config({ path: './config/config.env' });
 
 import bootcampRouter from './routes/bootcamps';
 import courseRouter from './routes/courses';
+import authRouter from './routes/auth';
+import userRouter from './routes/users';
+import reviewRouter from './routes/reviews';
 import express from 'express';
 import morgan from 'morgan';
 import connectDB from './config/database';
@@ -10,6 +13,7 @@ import 'colors';
 import errorHandler from './middleware/error';
 import fileUpload from 'express-fileupload';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 connectDB();
 
@@ -17,6 +21,9 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
@@ -30,6 +37,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampRouter);
 app.use('/api/v1/courses', courseRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.use(errorHandler);
 

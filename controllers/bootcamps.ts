@@ -1,10 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Response } from 'express';
 import Bootcamp from '../models/Bootcamp';
 import { Error } from 'mongoose';
 import { asyncHandler } from '../middleware/async';
 import { geocoder } from '../utils/geocoder';
 import path from 'path';
-import { AdvancedResults } from '../helpers/types';
+import { RequestWithUser, ResponseWithPagination } from '../helpers/types';
+import { ErrorResponse } from '../utils/errorResponse';
 
 /**
  * Gets all bootcamps
@@ -12,11 +13,7 @@ import { AdvancedResults } from '../helpers/types';
  * @access Public
  */
 export const getBootcamps = asyncHandler(
-  async (
-    _req: Request,
-    res: Response & { advancedResults?: AdvancedResults },
-    _next: NextFunction
-  ) => {
+  async (_req, res: ResponseWithPagination, _next) => {
     res.status(200).json(res.advancedResults);
   }
 );
@@ -27,7 +24,7 @@ export const getBootcamps = asyncHandler(
  * @access Public
  */
 export const getSingleBootcamp = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res: Response, next) => {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
@@ -46,7 +43,7 @@ export const getSingleBootcamp = asyncHandler(
  * @access Public
  */
 export const getBootcampsInRadius = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req, res: Response, _next) => {
     const { zipcode, distance } = req.params;
 
     const loc = await geocoder.geocode(zipcode);
@@ -73,7 +70,20 @@ export const getBootcampsInRadius = asyncHandler(
  * @access Private
  */
 export const createBootcamp = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req: RequestWithUser, res: Response, next) => {
+    if (!req.user) return next();
+
+    req.body.user = req.user._id;
+
+    // check for published bootcamp
+    const publishedBootcamp = await Bootcamp.findOne({ user: req.user?._id });
+
+    if (publishedBootcamp && req.user.role !== 'admin') {
+      throw new ErrorResponse(
+        `The user with id ${req.user._id} has already published a bootcamp`,
+        400
+      );
+    }
     const newBootcamp = await Bootcamp.create(req.body);
     res.status(201).json({
       success: true,
@@ -88,7 +98,24 @@ export const createBootcamp = asyncHandler(
  * @access Private
  */
 export const updateBootcamp = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req: RequestWithUser, res: Response, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
+
+    const bootcampToUpdate = await Bootcamp.findById(req.params.id);
+
+    if (!bootcampToUpdate)
+      throw new Error.CastError('string', req.params.id, '_id');
+
+    if (
+      req.user._id !== bootcampToUpdate.user?._id &&
+      req.user.role !== 'admin'
+    ) {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to update this bootcamp`,
+        403
+      );
+    }
+
     const updatedBootcamp = await Bootcamp.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -97,9 +124,6 @@ export const updateBootcamp = asyncHandler(
         runValidators: true,
       }
     );
-
-    if (!updatedBootcamp)
-      throw new Error.CastError('string', req.params.id, '_id');
 
     res.status(201).json({
       success: true,
@@ -114,11 +138,23 @@ export const updateBootcamp = asyncHandler(
  * @access Private
  */
 export const deleteBootcamp = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req: RequestWithUser, res: Response, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
+
     const bootcampToDelete = await Bootcamp.findById(req.params.id);
 
     if (!bootcampToDelete)
       throw new Error.CastError('string', req.params.id, '_id');
+
+    if (
+      req.user._id !== bootcampToDelete.user?._id &&
+      req.user.role !== 'admin'
+    ) {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to delete this bootcamp`,
+        403
+      );
+    }
 
     bootcampToDelete.remove();
     res.status(201).json({
@@ -134,11 +170,23 @@ export const deleteBootcamp = asyncHandler(
  * @access Private
  */
 export const uploadPhotoForBootcamp = asyncHandler(
-  async (req: Request, res: Response, _next: NextFunction) => {
+  async (req: RequestWithUser, res: Response, _next) => {
+    if (!req.user) throw new Error('Could not retrieve user details');
+
     const bootcampToUpdate = await Bootcamp.findById(req.params.id);
 
     if (!bootcampToUpdate)
       throw new Error.CastError('string', req.params.id, '_id');
+
+    if (
+      req.user._id !== bootcampToUpdate.user?._id &&
+      req.user.role !== 'admin'
+    ) {
+      throw new ErrorResponse(
+        `User id ${req.user._id} is not authorised to update this bootcamp`,
+        403
+      );
+    }
 
     if (!req.files) throw new Error('please upload a file');
 

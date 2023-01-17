@@ -1,8 +1,10 @@
-import mongoose, { Mongoose } from 'mongoose';
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 
 export type BootcampType = {
+  _id?: mongoose.Types.ObjectId;
   name?: string;
-  description: string;
+  description?: string;
   address?: string;
   careers?: string[];
   slug?: string;
@@ -27,6 +29,7 @@ export type BootcampType = {
   acceptGi?: boolean;
   createdAt?: Date;
   averageRating?: number;
+  user?: mongoose.Types.ObjectId;
 };
 
 export type BootCampSchemaType = mongoose.Schema<
@@ -49,6 +52,7 @@ export type CoursesType = {
   scholarshipAvailable: boolean;
   createdAt: Date;
   bootcamp: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
 };
 
 export type CoursesSchemaType = mongoose.Schema<
@@ -61,7 +65,11 @@ export type CoursesSchemaType = mongoose.Schema<
   mongoose.DefaultSchemaOptions,
   CoursesType
 >;
-
+export type GetAverageCostConstructor = {
+  constructor: {
+    getAverageCost: (id: mongoose.Types.ObjectId) => Promise<void>;
+  };
+};
 export type AdvancedResults = {
   success: boolean;
   count: number;
@@ -69,5 +77,30 @@ export type AdvancedResults = {
     next?: { page: number; limit: number };
     prev?: { page: number; limit: number };
   };
-  data: BootcampType[] | CoursesType[];
+  data: BootcampType[] | CoursesType[] | UserType[];
 };
+
+export type ResponseWithPagination = Response & {
+  advancedResults?: AdvancedResults;
+};
+
+export enum UserRole {
+  USER = 'user',
+  PUBLISHER = 'publisher',
+  ADMIN = 'admin',
+}
+
+export type UserType = {
+  _id?: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  role: UserRole;
+  password: string;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
+  createdAt: Date;
+  getSignedJWTToken: () => string;
+  getResetPasswordToken: () => string;
+};
+
+export type RequestWithUser = Request & { user?: UserType };

@@ -1,20 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
-import type { Model } from 'mongoose';
+import type { Model, PopulateOptions } from 'mongoose';
 import {
-  BootCampSchemaType,
   BootcampType,
-  CoursesSchemaType,
   CoursesType,
-  AdvancedResults,
+  UserType,
+  ResponseWithPagination,
 } from '../helpers/types';
 
 export const advancedResults =
-  (model: Model<any>, populate = '') =>
-  async (
-    req: Request,
-    res: Response & { advancedResults?: AdvancedResults },
-    next: NextFunction
-  ) => {
+  (
+    // model: Model<CoursesType> | Model<BootcampType> | Model<UserType>,
+    // model: Model<CoursesType | BootcampType | UserType>,
+    model: Model<any>,
+    populate?: PopulateOptions | string
+  ) =>
+  async (req: Request, res: ResponseWithPagination, next: NextFunction) => {
     const { select, sort, page, limit, ...queryClone } = req.query;
 
     // create operators
@@ -37,13 +37,15 @@ export const advancedResults =
     const endInd = pageInt * limitInt;
     const total = await model.countDocuments();
 
-    const results: BootcampType[] | CoursesType[] = await model
+    const results: BootcampType[] | CoursesType[] | UserType[] = await (
+      model as Model<BootcampType | CoursesType | UserType>
+    )
       .find(JSON.parse(queryWith$AtFront))
       .select(fields)
       .sort(sortBy)
       .skip(startInd)
       .limit(limitInt)
-      .populate(populate);
+      .populate((populate as PopulateOptions) || '');
 
     const pagination: {
       next?: { page: number; limit: number };

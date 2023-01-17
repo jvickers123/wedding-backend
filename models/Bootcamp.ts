@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
-import { BootCampSchemaType } from '../helpers/types';
+import { BootCampSchemaType, BootcampType } from '../helpers/types';
 import { geocoder } from '../utils/geocoder';
 import Course from './Course';
 
@@ -102,6 +102,11 @@ const BootcampSchema: BootCampSchemaType = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -134,8 +139,8 @@ BootcampSchema.pre('save', async function (next) {
 });
 
 // Cascade delete courses when a bootcamp is deleted
-BootcampSchema.pre('remove', async function (next) {
-  if ('_id' in this) await Course.deleteMany({ bootcamp: this._id });
+BootcampSchema.pre('remove', async function (this: BootcampType, next) {
+  await Course.deleteMany({ bootcamp: this._id });
   next();
 });
 

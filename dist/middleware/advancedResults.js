@@ -21,7 +21,10 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.advancedResults = void 0;
-const advancedResults = (model, populate = '') => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const advancedResults = (
+// model: Model<CoursesType> | Model<BootcampType> | Model<UserType>,
+// model: Model<CoursesType | BootcampType | UserType>,
+model, populate) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const _a = req.query, { select, sort, page, limit } = _a, queryClone = __rest(_a, ["select", "sort", "page", "limit"]);
     // create operators
     const queryString = JSON.stringify(queryClone);
@@ -42,7 +45,7 @@ const advancedResults = (model, populate = '') => (req, res, next) => __awaiter(
         .sort(sortBy)
         .skip(startInd)
         .limit(limitInt)
-        .populate(populate);
+        .populate(populate || '');
     const pagination = {};
     if (endInd < total) {
         pagination.next = { page: pageInt + 1, limit: limitInt };

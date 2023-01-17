@@ -18,6 +18,7 @@ const mongoose_1 = require("mongoose");
 const async_1 = require("../middleware/async");
 const geocoder_1 = require("../utils/geocoder");
 const path_1 = __importDefault(require("path"));
+const errorResponse_1 = require("../utils/errorResponse");
 /**
  * Gets all bootcamps
  * @route GET /api/v1/bootcamps
@@ -67,7 +68,16 @@ exports.getBootcampsInRadius = (0, async_1.asyncHandler)((req, res, _next) => __
  * @route POST /api/v1/bootcamps
  * @access Private
  */
-exports.createBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createBootcamp = (0, async_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    if (!req.user)
+        return next();
+    req.body.user = req.user._id;
+    // check for published bootcamp
+    const publishedBootcamp = yield Bootcamp_1.default.findOne({ user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id });
+    if (publishedBootcamp && req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`The user with id ${req.user._id} has already published a bootcamp`, 400);
+    }
     const newBootcamp = yield Bootcamp_1.default.create(req.body);
     res.status(201).json({
         success: true,
@@ -80,12 +90,20 @@ exports.createBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaite
  * @access Private
  */
 exports.updateBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
+    const bootcampToUpdate = yield Bootcamp_1.default.findById(req.params.id);
+    if (!bootcampToUpdate)
+        throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
+    if (req.user._id !== ((_b = bootcampToUpdate.user) === null || _b === void 0 ? void 0 : _b._id) &&
+        req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to update this bootcamp`, 403);
+    }
     const updatedBootcamp = yield Bootcamp_1.default.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
     });
-    if (!updatedBootcamp)
-        throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
     res.status(201).json({
         success: true,
         data: updatedBootcamp,
@@ -97,9 +115,16 @@ exports.updateBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaite
  * @access Private
  */
 exports.deleteBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
     const bootcampToDelete = yield Bootcamp_1.default.findById(req.params.id);
     if (!bootcampToDelete)
         throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
+    if (req.user._id !== ((_c = bootcampToDelete.user) === null || _c === void 0 ? void 0 : _c._id) &&
+        req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to delete this bootcamp`, 403);
+    }
     bootcampToDelete.remove();
     res.status(201).json({
         success: true,
@@ -112,9 +137,16 @@ exports.deleteBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaite
  * @access Private
  */
 exports.uploadPhotoForBootcamp = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
+    if (!req.user)
+        throw new mongoose_1.Error('Could not retrieve user details');
     const bootcampToUpdate = yield Bootcamp_1.default.findById(req.params.id);
     if (!bootcampToUpdate)
         throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
+    if (req.user._id !== ((_d = bootcampToUpdate.user) === null || _d === void 0 ? void 0 : _d._id) &&
+        req.user.role !== 'admin') {
+        throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to update this bootcamp`, 403);
+    }
     if (!req.files)
         throw new mongoose_1.Error('please upload a file');
     const { file } = req.files;
