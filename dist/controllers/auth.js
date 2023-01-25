@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.updateDetails = exports.resetPassword = exports.forgotPassword = exports.getMe = exports.loginUser = exports.registerUser = void 0;
+exports.updatePassword = exports.updateDetails = exports.resetPassword = exports.forgotPassword = exports.getMe = exports.logoutUser = exports.loginUser = exports.registerUser = void 0;
 const User_1 = __importDefault(require("../models/User"));
 const mongoose_1 = require("mongoose");
 const async_1 = require("../middleware/async");
@@ -63,6 +63,21 @@ exports.loginUser = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(voi
     if (!isMatched)
         throw new mongoose_1.Error('Invalid credentials');
     sendTokenResponse({ user, statusCode: 200, res });
+}));
+/**
+ * Logout user
+ * @route GET /api/v1/auth/logout
+ * @access private
+ */
+exports.logoutUser = (0, async_1.asyncHandler)((_, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.cookie('token', 'none', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
+    res.status(200).json({
+        success: true,
+        data: {},
+    });
 }));
 /**
  * Get current Logged in user

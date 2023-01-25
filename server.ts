@@ -14,6 +14,12 @@ import errorHandler from './middleware/error';
 import fileUpload from 'express-fileupload';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import expressMongoSanitize from 'express-mongo-sanitize';
+import helmet from 'helmet';
+import xssClean from 'xss-clean';
+import rateLimit from 'express-rate-limit';
+import hpp from 'hpp';
+import cors from 'cors';
 
 connectDB();
 
@@ -30,6 +36,29 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // file uploading
 app.use(fileUpload());
+
+// Sanitise data
+app.use(expressMongoSanitize());
+
+// Set security headers
+app.use(helmet());
+
+// prevent XSS attacks
+app.use(xssClean());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
+
+// prevent http param polution
+app.use(hpp());
+
+// enalble CORS
+app.use(cors());
 
 // set static folder
 app.use(express.static(path.join(__dirname, 'public')));

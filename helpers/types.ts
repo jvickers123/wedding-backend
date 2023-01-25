@@ -70,6 +70,12 @@ export type GetAverageCostConstructor = {
     getAverageCost: (id: mongoose.Types.ObjectId) => Promise<void>;
   };
 };
+
+export type GetAverageRatingConstructor = {
+  constructor: {
+    getAverageRating: (id: mongoose.Types.ObjectId) => Promise<void>;
+  };
+};
 export type AdvancedResults = {
   success: boolean;
   count: number;
@@ -104,3 +110,38 @@ export type UserType = {
 };
 
 export type RequestWithUser = Request & { user?: UserType };
+
+export type ReviewType = {
+  title: string;
+  text: string;
+  rating: number;
+  user: mongoose.Types.ObjectId;
+  bootcamp: mongoose.Types.ObjectId;
+};
+
+export type ReviewsModel = mongoose.Model<
+  mongoose.FlatRecord<{
+    user: {
+      cacheHexString?: unknown;
+      generate?: {} | undefined;
+      createFromTime?: {} | undefined;
+      createFromHexString?: {} | undefined;
+      isValid?: {} | undefined;
+      prototype?: mongoose.Types.ObjectId | undefined;
+    };
+    title: string;
+    bootcamp: {
+      prototype?: mongoose.Types.ObjectId | undefined;
+      cacheHexString?: unknown;
+      generate?: {} | undefined;
+      createFromTime?: {} | undefined;
+      createFromHexString?: {} | undefined;
+      isValid?: {} | undefined;
+    };
+    rating: number;
+  }>,
+  {},
+  {},
+  {},
+  any
+>;

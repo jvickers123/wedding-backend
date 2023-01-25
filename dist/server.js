@@ -18,6 +18,12 @@ const error_1 = __importDefault(require("./middleware/error"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const path_1 = __importDefault(require("path"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const express_mongo_sanitize_1 = __importDefault(require("express-mongo-sanitize"));
+const helmet_1 = __importDefault(require("helmet"));
+const xss_clean_1 = __importDefault(require("xss-clean"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const hpp_1 = __importDefault(require("hpp"));
+const cors_1 = __importDefault(require("cors"));
 (0, database_1.default)();
 const app = (0, express_1.default)();
 // Body parser
@@ -29,6 +35,22 @@ if (process.env.NODE_ENV === 'development')
     app.use((0, morgan_1.default)('dev'));
 // file uploading
 app.use((0, express_fileupload_1.default)());
+// Sanitise data
+app.use((0, express_mongo_sanitize_1.default)());
+// Set security headers
+app.use((0, helmet_1.default)());
+// prevent XSS attacks
+app.use((0, xss_clean_1.default)());
+// Rate limiting
+const limiter = (0, express_rate_limit_1.default)({
+    windowMs: 10 * 60 * 1000,
+    max: 100,
+});
+app.use(limiter);
+// prevent http param polution
+app.use((0, hpp_1.default)());
+// enalble CORS
+app.use((0, cors_1.default)());
 // set static folder
 app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
 // Mount routers
