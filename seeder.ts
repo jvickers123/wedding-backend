@@ -6,39 +6,27 @@ config({
 import fs from 'fs';
 import mongoose from 'mongoose';
 import 'colors';
-import Bootcamp from './models/Bootcamp';
-import Course from './models/Course';
+import Guest from './models/Guests';
 import User from './models/User';
-import Review from './models/Review';
 
 mongoose.set('strictQuery', false);
 
 mongoose.connect(process.env.MONGO_URI!);
 
-// console.log(fs.readFileSync(`${__dirname}`), 'whassup');
 const bootcamps = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8')
-);
-
-const courses = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/courses.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/_data/guests.json`, 'utf-8')
 );
 
 const users = JSON.parse(
   fs.readFileSync(`${__dirname}/_data/users.json`, 'utf-8')
 );
 
-const reviews = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/reviews.json`, 'utf-8')
-);
 
 // Import into db
 const importData = async () => {
   try {
-    await Bootcamp.create(bootcamps);
-    await Course.create(courses);
+    await Guest.create(bootcamps);
     await User.create(users);
-    await Review.create(reviews);
     console.log('Data imported'.green.inverse);
     process.exit();
   } catch (error) {
@@ -48,10 +36,8 @@ const importData = async () => {
 
 const deleteData = async () => {
   try {
-    await Bootcamp.deleteMany();
-    await Course.deleteMany();
+    await Guest.deleteMany();
     await User.deleteMany();
-    await Review.deleteMany();
     console.log('Data destroyed'.red.inverse);
     process.exit();
   } catch (error) {

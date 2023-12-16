@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserRole, UserType } from '../helpers/types';
+import { UserRole } from '../helpers/types';
 import crypto from 'crypto';
 
 const UserSchema = new mongoose.Schema(

@@ -1,11 +1,9 @@
 import { config } from 'dotenv';
 config({ path: './config/config.env' });
 
-import bootcampRouter from './routes/bootcamps';
-import courseRouter from './routes/courses';
+import guestRouter from './routes/guests';
 import authRouter from './routes/auth';
 import userRouter from './routes/users';
-import reviewRouter from './routes/reviews';
 import express from 'express';
 import morgan from 'morgan';
 import connectDB from './config/database';
@@ -64,11 +62,9 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
-app.use('/api/v1/bootcamps', bootcampRouter);
-app.use('/api/v1/courses', courseRouter);
+app.use('/api/v1/guests', guestRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/reviews', reviewRouter);
 
 app.use(errorHandler);
 

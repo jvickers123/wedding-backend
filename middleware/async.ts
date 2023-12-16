@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import {
-  AdvancedResults,
   RequestWithUser,
   ResponseWithPagination,
 } from '../helpers/types';

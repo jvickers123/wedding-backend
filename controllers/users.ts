@@ -9,7 +9,11 @@ import { ResponseWithPagination } from '../helpers/types';
  */
 export const getAllusers = asyncHandler(
   async (_req, res: ResponseWithPagination, _next) => {
-    res.status(200).json(res.advancedResults);
+    const users = await User.find();
+    res.status(200).json({
+      success: true,
+      data: users,
+    });
   }
 );
 

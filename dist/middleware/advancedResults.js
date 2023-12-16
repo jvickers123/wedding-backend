@@ -21,10 +21,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.advancedResults = void 0;
-const advancedResults = (
-// model: Model<CoursesType> | Model<BootcampType> | Model<UserType>,
-// model: Model<CoursesType | BootcampType | UserType>,
-model, populate) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const advancedResults = (model, populate) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const _a = req.query, { select, sort, page, limit } = _a, queryClone = __rest(_a, ["select", "sort", "page", "limit"]);
     // create operators
     const queryString = JSON.stringify(queryClone);

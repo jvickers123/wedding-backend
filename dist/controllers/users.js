@@ -21,7 +21,11 @@ const User_1 = __importDefault(require("../models/User"));
  * @access private admin
  */
 exports.getAllusers = (0, async_1.asyncHandler)((_req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).json(res.advancedResults);
+    const users = yield User_1.default.find();
+    res.status(200).json({
+        success: true,
+        data: users,
+    });
 }));
 /**
  * Get single user
