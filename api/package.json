@@ -2,10 +2,10 @@
   "name": "devcamper_api",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "index.ts",
   "scripts": {
-    "start": "NODE_ENV=production node dist/server",
-    "dev": "tsc-watch --onSuccess \"nodemon dist/server\""
+    "start": "NODE_ENV=production node dist/index",
+    "dev": "tsc-watch --onSuccess \"nodemon dist/index\""
   },
   "author": "Jonny Vickers",
   "license": "ISC",
