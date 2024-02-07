@@ -70,6 +70,8 @@ const UserSchema = new mongoose_1.default.Schema({
             return resetToken;
         },
     },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 // Encrypt password
 UserSchema.pre('save', function (next) {
@@ -80,5 +82,14 @@ UserSchema.pre('save', function (next) {
         const salt = yield bcryptjs_1.default.genSalt(10);
         this.password = yield bcryptjs_1.default.hash(this.password, salt);
     });
+});
+UserSchema.virtual('accomodation', {
+    ref: 'Accomodation',
+    localField: '_id',
+    foreignField: 'users',
+    justOne: true,
+});
+UserSchema.pre('find', function () {
+    this.populate('accomodation');
 });
 exports.default = mongoose_1.default.model('User', UserSchema);

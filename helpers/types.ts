@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 export type GuestType = {
@@ -62,3 +62,29 @@ export type UserType = {
 };
 
 export type RequestWithUser = Request & { user?: UserType };
+
+export type AccomodationType = {
+  name: string;
+  type: 'party' | 'empty';
+  slug?: string;
+  guests?: {
+    type: mongoose.Types.ObjectId[];
+    ref: 'Guests';
+  };
+  users?: {
+    type: mongoose.Types.ObjectId[];
+    ref: 'User';
+  };
+  paid: boolean;
+};
+
+export type AccomodationSchemaType = mongoose.Schema<
+  any,
+  mongoose.Model<any, any, any, any, any>,
+  {},
+  {},
+  {},
+  {},
+  mongoose.DefaultSchemaOptions,
+  AccomodationType
+>;

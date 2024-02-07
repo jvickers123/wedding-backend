@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const slugify_1 = __importDefault(require("slugify"));
-const GuestSchema = new mongoose_1.default.Schema({
+const AccomodationSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
         required: [true, 'Please add a name'],
@@ -13,39 +13,31 @@ const GuestSchema = new mongoose_1.default.Schema({
         trim: true,
         maxlength: [50, 'Name cannot be more than 50 characters'],
     },
-    email: {
-        type: String,
-        match: [
-            /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-            'Please add a valid email',
-        ],
-    },
     slug: String,
-    accomodation: {
+    type: {
+        required: [true, 'please add a type'],
         type: String,
     },
-    attending: {
-        type: String,
-    },
-    price: {
-        type: Number,
-    },
-    fullDay: {
+    paid: {
         type: Boolean,
         default: false,
     },
-    notes: {
-        type: String,
-        maxlength: [500, 'Notes cannot be more than 500 characters'],
+    guests: {
+        type: [mongoose_1.default.Schema.Types.ObjectId],
+        ref: 'Guest',
+    },
+    users: {
+        type: [mongoose_1.default.Schema.Types.ObjectId],
+        ref: 'User',
     },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
 });
-// create guest slug from the name
-GuestSchema.pre('save', function (next) {
+// create accomoation slug from the name
+AccomodationSchema.pre('save', function (next) {
     this.slug = (0, slugify_1.default)(this.name, { lower: true });
     next();
 });
-exports.default = mongoose_1.default.model('Guest', GuestSchema);
+exports.default = mongoose_1.default.model('Accomodation', AccomodationSchema);

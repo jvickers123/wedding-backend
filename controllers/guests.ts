@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import Guests from '../models/Guests';
 import { Error } from 'mongoose';
 import { asyncHandler } from '../middleware/async';
-import { RequestWithUser, ResponseWithPagination } from '../helpers/types';
+import { RequestWithUser } from '../helpers/types';
 import { ErrorResponse } from '../utils/errorResponse';
 
 /**
