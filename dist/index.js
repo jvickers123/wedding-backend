@@ -22,6 +22,7 @@ const xss_clean_1 = __importDefault(require("xss-clean"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const hpp_1 = __importDefault(require("hpp"));
 const cors_1 = __importDefault(require("cors"));
+const serverless_http_1 = __importDefault(require("serverless-http"));
 (0, database_1.default)();
 const app = (0, express_1.default)();
 // Body parser
@@ -56,10 +57,15 @@ app.use('/api/v1/guests', guests_1.default);
 app.use('/api/v1/auth', auth_1.default);
 app.use('/api/v1/users', users_1.default);
 app.use(error_1.default);
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta));
+// const PORT = process.env.PORT || 5000;
+// const server = app.listen(PORT, () =>
+//   console.log(
+//     `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta
+//   )
+// );
 // handle unhandle promise rejections
-process.on('unhandledRejection', (err) => {
-    console.log(`Error ${err.message}`.red);
-    server.close(() => process.exit(1));
-});
+// process.on('unhandledRejection', (err: Error) => {
+//   console.log(`Error ${err.message}`.red);
+//   server.close(() => process.exit(1));
+// });
+module.exports.handler = (0, serverless_http_1.default)(app);

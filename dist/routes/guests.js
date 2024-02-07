@@ -7,7 +7,7 @@ const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 router
     .route('/')
-    .get(auth_1.protect, (0, auth_1.authorize)(types_1.UserRole.PUBLISHER, types_1.UserRole.ADMIN), guests_1.getGuests)
+    .get(guests_1.getGuests)
     .post(auth_1.protect, (0, auth_1.authorize)(types_1.UserRole.PUBLISHER, types_1.UserRole.ADMIN), guests_1.createGuests);
 router
     .route('/:id')

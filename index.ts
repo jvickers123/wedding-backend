@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+config({ path: './config/config.env' });
 
 import guestRouter from './routes/guests';
 import authRouter from './routes/auth';
@@ -18,8 +19,6 @@ import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import cors from 'cors';
 import serverless from 'serverless-http';
-
-config({ path: './config/config.env' });
 
 connectDB();
 

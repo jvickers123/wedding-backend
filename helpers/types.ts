@@ -9,7 +9,8 @@ export type GuestType = {
   attending?: 'yes' | 'no' | 'maybe';
   price: number;
   fullDay?: boolean;
-}
+  notes?: string;
+};
 
 export type GuestSchemaType = mongoose.Schema<
   any,

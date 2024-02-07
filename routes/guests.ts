@@ -13,7 +13,7 @@ const router = Router();
 
 router
   .route('/')
-  .get(protect, authorize(UserRole.PUBLISHER, UserRole.ADMIN), getGuests)
+  .get(getGuests)
   .post(protect, authorize(UserRole.PUBLISHER, UserRole.ADMIN), createGuests);
 
 router

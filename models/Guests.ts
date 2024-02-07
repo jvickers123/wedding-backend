@@ -3,7 +3,7 @@ import slugify from 'slugify';
 import { GuestSchemaType } from '../helpers/types';
 
 const GuestSchema: GuestSchemaType = new mongoose.Schema(
-{
+  {
     name: {
       type: String,
       required: [true, 'Please add a name'],
@@ -32,12 +32,16 @@ const GuestSchema: GuestSchemaType = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    notes: {
+      type: String,
+      maxlength: [500, 'Notes cannot be more than 500 characters'],
+    },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-}
+  }
 );
 
 // create guest slug from the name
@@ -45,7 +49,5 @@ GuestSchema.pre('save', function (next) {
   this.slug = slugify(this.name!, { lower: true });
   next();
 });
-
-
 
 export default mongoose.model('Guest', GuestSchema);
