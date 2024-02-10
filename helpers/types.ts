@@ -1,4 +1,4 @@
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 export type GuestType = {
@@ -50,7 +50,6 @@ export enum UserRole {
 
 export type UserType = {
   _id?: mongoose.Types.ObjectId;
-  name: string;
   email: string;
   role: UserRole;
   password: string;
@@ -67,15 +66,10 @@ export type AccomodationType = {
   name: string;
   type: 'party' | 'empty';
   slug?: string;
-  guests?: {
-    type: mongoose.Types.ObjectId[];
-    ref: 'Guests';
-  };
-  users?: {
-    type: mongoose.Types.ObjectId[];
-    ref: 'User';
-  };
+  guests: mongoose.Types.ObjectId[];
+  users?: mongoose.Types.ObjectId[];
   paid: boolean;
+  price: number;
 };
 
 export type AccomodationSchemaType = mongoose.Schema<

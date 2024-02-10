@@ -8,15 +8,17 @@ const slugify_1 = __importDefault(require("slugify"));
 const AccomodationSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
-        required: [true, 'Please add a name'],
-        unique: true,
         trim: true,
-        maxlength: [50, 'Name cannot be more than 50 characters'],
+        required: [true, 'Please add a name'],
     },
-    slug: String,
     type: {
         required: [true, 'please add a type'],
         type: String,
+    },
+    slug: String,
+    price: {
+        type: Number,
+        required: [true, 'Please add a price'],
     },
     paid: {
         type: Boolean,
@@ -24,7 +26,8 @@ const AccomodationSchema = new mongoose_1.default.Schema({
     },
     guests: {
         type: [mongoose_1.default.Schema.Types.ObjectId],
-        ref: 'Guest',
+        ref: 'Guests',
+        required: [true, 'Please add some guests'],
     },
     users: {
         type: [mongoose_1.default.Schema.Types.ObjectId],

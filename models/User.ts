@@ -74,15 +74,4 @@ UserSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.virtual('accomodation', {
-  ref: 'Accomodation',
-  localField: '_id',
-  foreignField: 'users',
-  justOne: true,
-});
-
-UserSchema.pre('find', function () {
-  this.populate('accomodation');
-});
-
 export default mongoose.model('User', UserSchema);

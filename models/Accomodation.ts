@@ -1,20 +1,22 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
-import { AccomodationSchemaType, AccomodationType } from '../helpers/types';
+import { AccomodationSchemaType } from '../helpers/types';
 
 const AccomodationSchema: AccomodationSchemaType = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please add a name'],
-      unique: true,
       trim: true,
-      maxlength: [50, 'Name cannot be more than 50 characters'],
+      required: [true, 'Please add a name'],
     },
-    slug: String,
     type: {
       required: [true, 'please add a type'],
       type: String,
+    },
+    slug: String,
+    price: {
+      type: Number,
+      required: [true, 'Please add a price'],
     },
     paid: {
       type: Boolean,
@@ -22,7 +24,8 @@ const AccomodationSchema: AccomodationSchemaType = new mongoose.Schema(
     },
     guests: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Guest',
+      ref: 'Guests',
+      required: [true, 'Please add some guests'],
     },
     users: {
       type: [mongoose.Schema.Types.ObjectId],

@@ -50,4 +50,15 @@ GuestSchema.pre('save', function (next) {
   next();
 });
 
+GuestSchema.virtual('accomodationTents', {
+  ref: 'Accomodation',
+  localField: '_id',
+  foreignField: 'guests',
+  justOne: true,
+});
+
+GuestSchema.pre('find', function () {
+  this.populate('accomodationTents');
+});
+
 export default mongoose.model('Guest', GuestSchema);

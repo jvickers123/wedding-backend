@@ -48,4 +48,13 @@ GuestSchema.pre('save', function (next) {
     this.slug = (0, slugify_1.default)(this.name, { lower: true });
     next();
 });
+GuestSchema.virtual('accomodationTents', {
+    ref: 'Accomodation',
+    localField: '_id',
+    foreignField: 'guests',
+    justOne: true,
+});
+GuestSchema.pre('find', function () {
+    this.populate('accomodationTents');
+});
 exports.default = mongoose_1.default.model('Guest', GuestSchema);
