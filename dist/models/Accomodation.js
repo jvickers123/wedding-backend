@@ -33,6 +33,7 @@ const AccomodationSchema = new mongoose_1.default.Schema({
         type: [mongoose_1.default.Schema.Types.ObjectId],
         ref: 'User',
     },
+    notes: String,
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

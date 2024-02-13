@@ -69,6 +69,7 @@ export type AccomodationType = {
   guests: mongoose.Types.ObjectId[];
   users?: mongoose.Types.ObjectId[];
   paid: boolean;
+  notes?: string;
   price: number;
 };
 
