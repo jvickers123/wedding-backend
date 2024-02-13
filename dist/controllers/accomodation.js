@@ -23,10 +23,7 @@ const errorResponse_1 = require("../utils/errorResponse");
  * @access Public
  */
 exports.getAllAccomodation = (0, async_1.asyncHandler)((_req, res, _next) => __awaiter(void 0, void 0, void 0, function* () {
-    const allAccomodation = yield Accomodation_1.default.find().populate({
-        path: 'users',
-        select: 'name',
-    });
+    const allAccomodation = yield Accomodation_1.default.find().populate('guests', 'name');
     res.status(200).json({
         success: true,
         data: allAccomodation,
@@ -40,10 +37,7 @@ exports.getAllAccomodation = (0, async_1.asyncHandler)((_req, res, _next) => __a
 exports.getSingleAccomodation = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.user)
         throw new mongoose_1.Error('Could not retrieve user details');
-    const accomoation = yield Accomodation_1.default.findById(req.params.id).populate({
-        path: 'users',
-        select: 'name',
-    });
+    const accomoation = yield Accomodation_1.default.findById(req.params.id).populate('guests', 'name');
     if (!accomoation)
         throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
     res.status(200).json({

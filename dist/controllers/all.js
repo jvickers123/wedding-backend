@@ -29,10 +29,7 @@ exports.getGuestsAndAccomodation = (0, async_1.asyncHandler)((req, res, _next) =
     if (req.user.role !== 'admin') {
         throw new errorResponse_1.ErrorResponse(`User id ${req.user._id} is not authorised to delete this accomodation`, 403);
     }
-    const accomodation = yield Accomodation_1.default.find().populate({
-        path: 'users',
-        select: 'name',
-    });
+    const accomodation = yield Accomodation_1.default.find().populate('guests', 'name');
     const guests = yield Guests_1.default.find();
     res.status(200).json({
         success: true,

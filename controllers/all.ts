@@ -22,10 +22,7 @@ export const getGuestsAndAccomodation = asyncHandler(
       );
     }
 
-    const accomodation = await Accomodation.find().populate({
-      path: 'users',
-      select: 'name',
-    });
+    const accomodation = await Accomodation.find().populate('guests', 'name');
 
     const guests = await Guests.find();
 

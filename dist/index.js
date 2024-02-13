@@ -5,12 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)({ path: './config/config.env' });
+const express_1 = __importDefault(require("express"));
 const guests_1 = __importDefault(require("./routes/guests"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const users_1 = __importDefault(require("./routes/users"));
 const accomodation_1 = __importDefault(require("./routes/accomodation"));
 const all_1 = __importDefault(require("./routes/all"));
-const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const database_1 = __importDefault(require("./config/database"));
 require("colors");
@@ -61,15 +61,11 @@ app.use('/api/v1/users', users_1.default);
 app.use('/api/v1/accomodation', accomodation_1.default);
 app.use('/api/v1/all', all_1.default);
 app.use(error_1.default);
-// const PORT = process.env.PORT || 5000;
-// const server = app.listen(PORT, () =>
-//   console.log(
-//     `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta
-//   )
-// );
-// // handle unhandle promise rejections
-// process.on('unhandledRejection', (err: Error) => {
-//   console.log(`Error ${err.message}`.red);
-//   server.close(() => process.exit(1));
-// });
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta));
+// handle unhandle promise rejections
+process.on('unhandledRejection', (err) => {
+    console.log(`Error ${err.message}`.red);
+    server.close(() => process.exit(1));
+});
 module.exports.handler = (0, serverless_http_1.default)(app);

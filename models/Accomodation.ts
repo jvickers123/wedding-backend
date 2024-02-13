@@ -24,7 +24,7 @@ const AccomodationSchema: AccomodationSchemaType = new mongoose.Schema(
     },
     guests: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Guests',
+      ref: 'Guest',
       required: [true, 'Please add some guests'],
     },
     users: {

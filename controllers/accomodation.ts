@@ -12,10 +12,10 @@ import { ErrorResponse } from '../utils/errorResponse';
  */
 export const getAllAccomodation = asyncHandler(
   async (_req, res: Response, _next) => {
-    const allAccomodation = await Accomodation.find().populate({
-      path: 'users',
-      select: 'name',
-    });
+    const allAccomodation = await Accomodation.find().populate(
+      'guests',
+      'name'
+    );
 
     res.status(200).json({
       success: true,
@@ -33,10 +33,10 @@ export const getSingleAccomodation = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     if (!req.user) throw new Error('Could not retrieve user details');
 
-    const accomoation = await Accomodation.findById(req.params.id).populate({
-      path: 'users',
-      select: 'name',
-    });
+    const accomoation = await Accomodation.findById(req.params.id).populate(
+      'guests',
+      'name'
+    );
 
     if (!accomoation) throw new Error.CastError('string', req.params.id, '_id');
 

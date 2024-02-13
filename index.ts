@@ -1,12 +1,12 @@
 import { config } from 'dotenv';
 config({ path: './config/config.env' });
 
+import express from 'express';
 import guestRouter from './routes/guests';
 import authRouter from './routes/auth';
 import userRouter from './routes/users';
 import accomdationRouter from './routes/accomodation';
 import guestAndAccomodationRouter from './routes/all';
-import express from 'express';
 import morgan from 'morgan';
 import connectDB from './config/database';
 import 'colors';
@@ -73,18 +73,18 @@ app.use('/api/v1/all', guestAndAccomodationRouter);
 
 app.use(errorHandler);
 
-// const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
-// const server = app.listen(PORT, () =>
-//   console.log(
-//     `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta
-//   )
-// );
+const server = app.listen(PORT, () =>
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta
+  )
+);
 
-// // handle unhandle promise rejections
-// process.on('unhandledRejection', (err: Error) => {
-//   console.log(`Error ${err.message}`.red);
-//   server.close(() => process.exit(1));
-// });
+// handle unhandle promise rejections
+process.on('unhandledRejection', (err: Error) => {
+  console.log(`Error ${err.message}`.red);
+  server.close(() => process.exit(1));
+});
 
 module.exports.handler = serverless(app);
