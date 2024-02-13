@@ -5,6 +5,7 @@ import guestRouter from './routes/guests';
 import authRouter from './routes/auth';
 import userRouter from './routes/users';
 import accomdationRouter from './routes/accomodation';
+import guestAndAccomodationRouter from './routes/all';
 import express from 'express';
 import morgan from 'morgan';
 import connectDB from './config/database';
@@ -68,6 +69,7 @@ app.use('/api/v1/guests', guestRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/accomodation', accomdationRouter);
+app.use('/api/v1/all', guestAndAccomodationRouter);
 
 app.use(errorHandler);
 
