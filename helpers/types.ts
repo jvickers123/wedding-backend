@@ -64,7 +64,7 @@ export type RequestWithUser = Request & { user?: UserType };
 
 export type AccomodationType = {
   name: string;
-  type: 'party' | 'empty';
+  type: 'party' | 'empty' | 'luxury';
   slug?: string;
   guests: mongoose.Types.ObjectId[];
   users?: mongoose.Types.ObjectId[];
