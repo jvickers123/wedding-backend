@@ -38,6 +38,15 @@ const GuestSchema = new mongoose_1.default.Schema({
         type: String,
         maxlength: [500, 'Notes cannot be more than 500 characters'],
     },
+    lunch: {
+        type: String,
+    },
+    hotdog: {
+        type: String,
+    },
+    dietryRequirements: {
+        type: String,
+    },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

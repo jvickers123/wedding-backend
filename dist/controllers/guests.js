@@ -37,7 +37,7 @@ exports.getGuests = (0, async_1.asyncHandler)((_req, res, next) => __awaiter(voi
 exports.getSingleGuests = (0, async_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.user)
         throw new mongoose_1.Error('Could not retrieve user details');
-    const guest = yield Guests_1.default.findById(req.params.id);
+    const guest = yield Guests_1.default.findById(req.params.id).populate('accomodationTents');
     if (!guest)
         throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
     if (req.user.email !== guest.email && req.user.role !== 'admin') {

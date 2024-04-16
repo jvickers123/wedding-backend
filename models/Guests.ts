@@ -36,6 +36,15 @@ const GuestSchema: GuestSchemaType = new mongoose.Schema(
       type: String,
       maxlength: [500, 'Notes cannot be more than 500 characters'],
     },
+    lunch: {
+      type: String,
+    },
+    hotdog: {
+      type: String,
+    },
+    dietryRequirements: {
+      type: String,
+    },
   },
   {
     timestamps: true,

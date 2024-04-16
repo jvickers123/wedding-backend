@@ -28,7 +28,7 @@ export const getSingleGuests = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     if (!req.user) throw new Error('Could not retrieve user details');
 
-    const guest = await Guests.findById(req.params.id);
+    const guest = await Guests.findById(req.params.id).populate('accomodationTents');
 
     if (!guest) throw new Error.CastError('string', req.params.id, '_id');
 

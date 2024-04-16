@@ -10,6 +10,9 @@ export type GuestType = {
   price: number;
   fullDay?: boolean;
   notes?: string;
+  lunch?: 'lamb' | 'salmon' | 'veggie' | 'vegan' | 'none';
+  hotdog?: 'classic' | 'fish' | 'halloumi' | 'tofu' | 'none';
+  dietryRequirements?: string;
 };
 
 export type GuestSchemaType = mongoose.Schema<
