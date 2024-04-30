@@ -17,13 +17,14 @@ const Guests_1 = __importDefault(require("../models/Guests"));
 const mongoose_1 = require("mongoose");
 const async_1 = require("../middleware/async");
 const errorResponse_1 = require("../utils/errorResponse");
+const encryption_1 = require("../utils/encryption");
 /**
  * Gets all guests
  * @route GET /api/v1/guests
  * @access Public
  */
 exports.getGuests = (0, async_1.asyncHandler)((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const guests = yield Guests_1.default.find();
+    const guests = yield Guests_1.default.find().select('-email');
     res.status(200).json({
         success: true,
         data: guests,
@@ -78,10 +79,16 @@ exports.updateGuest = (0, async_1.asyncHandler)((req, res, _next) => __awaiter(v
     const guestToUpdate = yield Guests_1.default.findById(req.params.id);
     if (!guestToUpdate)
         throw new mongoose_1.Error.CastError('string', req.params.id, '_id');
+    // Check if email is being updated
+    if (req.body.email) {
+        // Encrypt the new email
+        console.log(process.env.ENCRYPTION_KEY);
+        req.body.encryptedEmail = (0, encryption_1.encryptEmail)(req.body.email);
+    }
     const updatedGuest = yield Guests_1.default.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
-    });
+    }).select('-email');
     res.status(201).json({
         success: true,
         data: updatedGuest,

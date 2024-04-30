@@ -6,7 +6,6 @@ import { asyncHandler } from '../middleware/async';
 import { sendEmail } from '../utils/sendEmail';
 import { ErrorResponse } from '../utils/errorResponse';
 import crypto from 'crypto';
-import { match } from 'assert';
 
 const sendTokenResponse = ({
   user,

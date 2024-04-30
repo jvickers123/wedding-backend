@@ -4,6 +4,7 @@ import { Error } from 'mongoose';
 import { asyncHandler } from '../middleware/async';
 import { RequestWithUser } from '../helpers/types';
 import { ErrorResponse } from '../utils/errorResponse';
+import { encryptEmail } from '../utils/encryption';
 
 /**
  * Gets all guests
@@ -11,7 +12,7 @@ import { ErrorResponse } from '../utils/errorResponse';
  * @access Public
  */
 export const getGuests = asyncHandler(async (_req, res: Response, next) => {
-  const guests = await Guests.find();
+  const guests = await Guests.find().select('-email');
 
   res.status(200).json({
     success: true,
@@ -28,7 +29,9 @@ export const getSingleGuests = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     if (!req.user) throw new Error('Could not retrieve user details');
 
-    const guest = await Guests.findById(req.params.id).populate('accomodationTents');
+    const guest = await Guests.findById(req.params.id).populate(
+      'accomodationTents'
+    );
 
     if (!guest) throw new Error.CastError('string', req.params.id, '_id');
 
@@ -84,10 +87,17 @@ export const updateGuest = asyncHandler(async (req, res: Response, _next) => {
 
   if (!guestToUpdate) throw new Error.CastError('string', req.params.id, '_id');
 
+  // Check if email is being updated
+  if (req.body.email) {
+    // Encrypt the new email
+    console.log(process.env.ENCRYPTION_KEY);
+    req.body.encryptedEmail = encryptEmail(req.body.email);
+  }
+
   const updatedGuest = await Guests.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
-  });
+  }).select('-email');
 
   res.status(201).json({
     success: true,

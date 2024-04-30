@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 export type GuestType = {
   name: string;
   email?: string;
+  encryptedEmail?: string;
   slug?: string;
   accomodation?: string;
   attending?: 'yes' | 'no' | 'maybe';

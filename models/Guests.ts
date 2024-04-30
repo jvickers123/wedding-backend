@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
 import { GuestSchemaType } from '../helpers/types';
+import { encryptEmail } from '../utils/encryption';
 
 const GuestSchema: GuestSchemaType = new mongoose.Schema(
   {
@@ -17,6 +18,9 @@ const GuestSchema: GuestSchemaType = new mongoose.Schema(
         /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
         'Please add a valid email',
       ],
+    },
+    encryptedEmail: {
+      type: String,
     },
     slug: String,
     accomodation: {
@@ -56,6 +60,14 @@ const GuestSchema: GuestSchemaType = new mongoose.Schema(
 // create guest slug from the name
 GuestSchema.pre('save', function (next) {
   this.slug = slugify(this.name!, { lower: true });
+
+  if (!this.isModified('email')) {
+    return next();
+  }
+
+  // add encrypted password
+  this.encryptedEmail = encryptEmail(this.email!);
+
   next();
 });
 

@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const slugify_1 = __importDefault(require("slugify"));
+const encryption_1 = require("../utils/encryption");
 const GuestSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
@@ -19,6 +20,9 @@ const GuestSchema = new mongoose_1.default.Schema({
             /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
             'Please add a valid email',
         ],
+    },
+    encryptedEmail: {
+        type: String,
     },
     slug: String,
     accomodation: {
@@ -55,6 +59,11 @@ const GuestSchema = new mongoose_1.default.Schema({
 // create guest slug from the name
 GuestSchema.pre('save', function (next) {
     this.slug = (0, slugify_1.default)(this.name, { lower: true });
+    if (!this.isModified('email')) {
+        return next();
+    }
+    // add encrypted password
+    this.encryptedEmail = (0, encryption_1.encryptEmail)(this.email);
     next();
 });
 GuestSchema.virtual('accomodationTents', {
