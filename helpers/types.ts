@@ -77,6 +77,14 @@ export type AccomodationType = {
   price: number;
 };
 
+export type NoticeType = {
+  slug?: string;
+  title: string;
+  message: string;
+  user: mongoose.Types.ObjectId;
+  createdAt: Date;
+};
+
 export type AccomodationSchemaType = mongoose.Schema<
   any,
   mongoose.Model<any, any, any, any, any>,
@@ -86,4 +94,15 @@ export type AccomodationSchemaType = mongoose.Schema<
   {},
   mongoose.DefaultSchemaOptions,
   AccomodationType
+>;
+
+export type NoticeSchemaType = mongoose.Schema<
+  any,
+  mongoose.Model<any, any, any, any, any>,
+  {},
+  {},
+  {},
+  {},
+  mongoose.DefaultSchemaOptions,
+  NoticeType
 >;
